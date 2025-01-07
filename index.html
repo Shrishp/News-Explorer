@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>News Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Stories for You</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header>
+    <input type="text" id="searchInput" placeholder="Search news..." />
+    <h1>Top stories for you</h1>
+  </header>
+  <nav class="category-filters">
+    <button data-category="all" class="active">All</button>
+    <button data-category="business">Business</button>
+    <button data-category="politics">Politics</button>
+    <button data-category="sport">Sports</button>
+    <button data-category="entertainment">Entertainment</button>
+  </nav>
   <main>
     <div class="news-container" id="newsContainer">
     </div>
+    <button id="showMoreBtn" class="show-more-btn" style="display: none;">Show More</button>
   </main>
   <script src="script.js"></script>
 </body>
