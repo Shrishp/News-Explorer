@@ -335,7 +335,6 @@ const data = [
   },
 ];
 
-
 const newsContainer = document.getElementById("newsContainer");
 const categoryButtons = document.querySelectorAll(".category-filters button");
 const showMoreBtn = document.getElementById("showMoreBtn");
@@ -345,78 +344,117 @@ let visibleArticles = 7;
 let filteredData = data;
 
 function renderNews(articles, searchTerm = "") {
-const highlightTerm = (text, term) =>
-  term
-    ? text.replace(
-        new RegExp(`(${term})`, "gi"),
-        '<span style="color: red; font-weight: bold;">$1</span>'
-      )
-    : text;
+  const highlightTerm = (text, term) =>
+    term
+      ? text.replace(
+          new RegExp(`(${term})`, "gi"),
+          '<span style="color: red; font-weight: bold;">$1</span>'
+        )
+      : text;
 
-newsContainer.textContent = "";
+  newsContainer.textContent = "";
 
-articles.slice(0, visibleArticles).forEach((article) => {
-  const newsCard = document.createElement("div");
-  newsCard.className = "news-card";
+  articles.slice(0, visibleArticles).forEach((article) => {
+    const newsCard = document.createElement("div");
+    newsCard.className = "news-card";
 
-  const title = document.createElement("h3");
-  title.innerHTML = highlightTerm(article.title, searchTerm);
-  newsCard.appendChild(title);
+    const title = document.createElement("h3");
+    title.innerHTML = highlightTerm(article.title, searchTerm);
+    newsCard.appendChild(title);
 
-  const content = document.createElement("p");
-  content.innerHTML = highlightTerm(article.content, searchTerm);
-  newsCard.appendChild(content);
+    const content = document.createElement("p");
+    content.innerHTML = highlightTerm(article.content, searchTerm);
+    newsCard.appendChild(content);
 
-  const date = document.createElement("small");
-  date.textContent = new Date(article.date).toLocaleDateString();
-  newsCard.appendChild(date);
+    const date = document.createElement("small");
+    date.textContent = new Date(article.date).toLocaleDateString();
+    newsCard.appendChild(date);
 
-  newsContainer.appendChild(newsCard);
-});
+    newsContainer.appendChild(newsCard);
+  });
 
-showMoreBtn.style.display = articles.length > visibleArticles ? "block" : "none";
+  showMoreBtn.style.display = articles.length > visibleArticles ? "block" : "none";
+}
+
+function updateCategorySelection(button) {
+  const category = button.getAttribute("data-category");
+
+  if (category === "all") {
+    categoryButtons.forEach((btn) => {
+      btn.classList.remove("active");
+      btn.style.backgroundColor = ""; // Reset background
+      btn.style.color = ""; // Reset font color
+    });
+    button.classList.add("active");
+    button.style.backgroundColor = "black";
+    button.style.color = "white";
+    filteredData = data;
+  } else {
+    const allButton = Array.from(categoryButtons).find(
+      (btn) => btn.getAttribute("data-category") === "all"
+    );
+    allButton.classList.remove("active");
+    allButton.style.backgroundColor = "";
+    allButton.style.color = "";
+
+    if (button.classList.contains("active")) {
+      button.classList.remove("active");
+      button.style.backgroundColor = "";
+      button.style.color = "";
+    } else {
+      button.classList.add("active");
+      button.style.backgroundColor = "black";
+      button.style.color = "white";
+    }
+
+    const activeCategories = Array.from(categoryButtons)
+      .filter((btn) => btn.classList.contains("active"))
+      .map((btn) => btn.getAttribute("data-category"));
+
+    filteredData =
+      activeCategories.length === 0
+        ? data
+        : data.filter((article) => activeCategories.includes(article.category));
+  }
+
+  visibleArticles = 7;
+  renderNews(filteredData, searchInput.value.toLowerCase());
 }
 
 categoryButtons.forEach((button) => {
-button.addEventListener("click", () => {
-  const category = button.getAttribute("data-category");
-
-  categoryButtons.forEach((btn) => btn.classList.remove("active"));
-  button.classList.add("active");
-
-  filteredData =
-    category === "all" ? data : data.filter((article) => article.category === category);
-
-  visibleArticles = 7;
-  renderNews(filteredData);
-});
+  button.addEventListener("click", () => updateCategorySelection(button));
 });
 
 function debounce(func, wait) {
-let timeout;
-return function (...args) {
-  clearTimeout(timeout);
-  timeout = setTimeout(() => func.apply(this, args), wait);
-};
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
 }
 
 const debouncedSearch = debounce((searchTerm) => {
-const searchedData = filteredData.filter(
-  (article) =>
-    article.title.toLowerCase().includes(searchTerm) ||
-    article.content.toLowerCase().includes(searchTerm)
-);
-renderNews(searchedData, searchTerm);
+  const searchedData = filteredData.filter(
+    (article) =>
+      article.title.toLowerCase().includes(searchTerm) ||
+      article.content.toLowerCase().includes(searchTerm)
+  );
+  renderNews(searchedData, searchTerm);
 }, 300);
 
 searchInput.addEventListener("input", (e) => {
-const searchTerm = e.target.value.toLowerCase();
-debouncedSearch(searchTerm);
+  const searchTerm = e.target.value.toLowerCase();
+  debouncedSearch(searchTerm);
 });
 
 showMoreBtn.addEventListener("click", () => {
-visibleArticles += 7;
-renderNews(filteredData, searchInput.value.toLowerCase());
+  visibleArticles += 7;
+  renderNews(filteredData, searchInput.value.toLowerCase());
 });
 
-renderNews(data);
+document.addEventListener("DOMContentLoaded", () => {
+  const allButton = Array.from(categoryButtons).find(
+    (btn) => btn.getAttribute("data-category") === "all"
+  );
+  updateCategorySelection(allButton);
+});
