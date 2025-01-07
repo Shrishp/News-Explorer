@@ -458,3 +458,52 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   updateCategorySelection(allButton);
 });
+
+
+function renderNews(articles, searchTerm = "") {
+  const highlightTerm = (text, term) =>
+    term
+      ? text.replace(
+          new RegExp(`(${term})`, "gi"),
+          '<span style="color: red; font-weight: bold;">$1</span>'
+        )
+      : text;
+
+  newsContainer.textContent = "";
+
+  articles.slice(0, visibleArticles).forEach((article) => {
+    const newsCard = document.createElement("div");
+    newsCard.className = "news-card";
+
+    const title = document.createElement("h3");
+    title.innerHTML = highlightTerm(article.title, searchTerm);
+    title.style.fontWeight = "bold";
+    newsCard.appendChild(title);
+
+    const date = document.createElement("small");
+    if (article.dateAndTime) {
+      const [datePart, timePart] = article.dateAndTime.split(", ");
+      const [month, day, year] = datePart.split("/").map(Number);
+      const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+      const validDate = new Date(year, month - 1, day, hours, minutes, seconds);
+
+      date.textContent = !isNaN(validDate)
+        ? validDate.toLocaleDateString() + " " + validDate.toLocaleTimeString()
+        : "Invalid Date Format";
+    } else {
+      console.warn(`Missing date for article: ${article.title}`);
+      date.textContent = "Unknown Date";
+    }
+    date.style.fontWeight = "bold"; 
+    newsCard.appendChild(date);
+
+    const content = document.createElement("p");
+    content.innerHTML = highlightTerm(article.content, searchTerm);
+    newsCard.appendChild(content);
+
+    newsContainer.appendChild(newsCard);
+  });
+
+  showMoreBtn.style.display = articles.length > visibleArticles ? "block" : "none";
+}
