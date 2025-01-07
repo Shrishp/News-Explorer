@@ -337,7 +337,7 @@ const data = [
   
 const newsContainer = document.getElementById("newsContainer");
 const categoryButtons = document.querySelectorAll(".category-filters button");
-const showMoreBtn = document.getElementById("showMoreBtn");
+const showMoreBt = document.getElementById("showMoreBt");
 const searchInput = document.getElementById("searchInput");
 
 let visibleArticles = 7; 
@@ -356,7 +356,7 @@ function renderNews(articles) {
     )
     .join("");
 
-  showMoreBtn.style.display = articles.length > visibleArticles ? "block" : "none";
+  showMoreBt.style.display = articles.length > visibleArticles ? "block" : "none";
 }
 
 categoryButtons.forEach((button) => {
@@ -383,7 +383,7 @@ searchInput.addEventListener("input", (e) => {
   renderNews(searchedData);
 });
 
-showMoreBtn.addEventListener("click", () => {
+showMoreBt.addEventListener("click", () => {
   visibleArticles += 7; 
   renderNews(filteredData);
 });
